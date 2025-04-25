@@ -1,0 +1,195 @@
+{% comment %} {% for post in posts %}
+    <div class="post">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content }}</p>
+        <p><strong>By:</strong> {{ post.author.username }} | <strong>Created:</strong> {{ post.created_at }}</p>
+        <a href="{% url 'post_detail' post.id %}">View Details</a>
+    </div>
+{% endfor %} {% endcomment %}
+
+<div class="posts-container">
+    {% for post in posts %}
+    <div class="post-card">
+        <!-- رأس البطاقة -->
+        <div class="post-header">
+            <img src="{{ post.author.profile_picture.url|default:'/static/images/default-avatar.png' }}" 
+                 class="post-avatar" 
+                 alt="{{ post.author.username }}">
+            <div class="post-meta">
+                <h3 class="post-title">{{ post.title }}</h3>
+                <div class="post-author-info">
+                    <span class="author-name">{{ post.author.username }}</span>
+                    <span class="post-date">{{ post.created_at|date:"F j, Y" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- محتوى البطاقة -->
+        <div class="post-content">
+            <p>{{ post.content|truncatechars:200 }}</p>
+        </div>
+        
+        <!-- أقدام البطاقة -->
+        <div class="post-footer">
+            <a href="{% url 'post_detail' post.id %}" class="read-more-btn">
+                Read More <i class="fas fa-arrow-right"></i>
+            </a>
+            
+            <div class="post-stats">
+                <span class="likes-count">
+                    <i class="far fa-heart"></i> {{ post.likes.count }}
+                </span>
+                <span class="comments-count">
+                    <i class="far fa-comment"></i> {{ post.comments.count }}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-posts">
+        <i class="far fa-folder-open"></i>
+        <p>No posts available yet</p>
+    </div>
+    {% endfor %}
+
+    <style>
+    /* التنسيق العام */
+    .posts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* بطاقة المنشور */
+    .post-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .post-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* رأس البطاقة */
+    .post-header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .post-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+        border: 2px solid #eaeaea;
+    }
+
+    .post-meta {
+        flex: 1;
+    }
+
+    .post-title {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .post-author-info {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+
+    .author-name {
+        font-weight: 500;
+        color: #3498db;
+    }
+
+    .post-date {
+        color: #95a5a6;
+    }
+
+    /* محتوى البطاقة */
+    .post-content {
+        padding: 20px;
+        color: #34495e;
+        line-height: 1.6;
+    }
+
+    /* تذييل البطاقة */
+    .post-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: #f9f9f9;
+        border-top: 1px solid #eee;
+    }
+
+    .read-more-btn {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .read-more-btn:hover {
+        color: #2980b9;
+    }
+
+    .read-more-btn i {
+        margin-left: 5px;
+        font-size: 0.8rem;
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 15px;
+    }
+
+    .likes-count, .comments-count {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+    }
+
+    .likes-count i, .comments-count i {
+        margin-right: 5px;
+    }
+
+    /* حالة عدم وجود منشورات */
+    .no-posts {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 50px;
+        color: #95a5a6;
+    }
+
+    .no-posts i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .no-posts p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    </style>
+</div>
+
+<div style="text-align: center; margin-top: 20px;">
+    <a href="javascript:history.back()" class="back-button" style="text-decoration: none; color: #ffffff; background-color: #3498db; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">Back</a>
+</div>

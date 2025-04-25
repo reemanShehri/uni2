@@ -1,0 +1,119 @@
+{% comment %} <h1>{{ post.title }}</h1>
+<p>{{ post.content }}</p>
+<p><strong>By:</strong> {{ post.author.username }} | <strong>Created:</strong> {{ post.created_at }}</p>
+
+<h3>Replies:</h3>
+{% for reply in replies %}
+    <div class="reply">
+        <p>{{ reply.content }}</p>
+        <p><strong>By:</strong> {{ reply.author.user.username }} | <strong>Posted:</strong> {{ reply.created_at }}</p>
+    </div>
+{% endfor %} {% endcomment %}
+
+<div class="post-container">
+    <div class="post-card">
+        <img class="post-author-image" src="{{ post.author.profile_picture.url }}" alt="Author Image" width="100" height="100" style="border-radius: 50%; margin-bottom: 15px;">
+        <h1 class="post-title">{{ post.title }}</h1>
+        <p class="post-content">{{ post.content }}</p>
+        <p class="post-meta">
+            <strong>By:</strong> {{ post.author.user.username }} | 
+            <strong>Created:</strong> {{ post.created_at }}
+        </p>
+    </div>
+
+    <h3 class="replies-title">Replies:</h3>
+    <div class="replies-container">
+        {% for reply in replies %}
+            <div class="reply-card">
+                <img class="reply-author-image" src="{{ reply.author.profile_picture.url }}" alt="Author Image" width="50" height="50" style="border-radius: 50%; margin-right: 10px;">
+                <p class="reply-content">{{ reply.content }}</p>
+                <p class="reply-meta">
+                    <strong>By:</strong> {{ reply.author.user.username }} | 
+                    <strong>Posted:</strong> {{ reply.created_at }}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* الحاوية العامة */
+    .post-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        color: #333;
+    }
+
+    /* تصميم بطاقة المنشور */
+    .post-card {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    /* عنوان المنشور */
+    .post-title {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+
+    /* محتوى المنشور */
+    .post-content {
+        font-size: 1.2rem;
+        color: #555;
+        margin-bottom: 15px;
+    }
+
+    /* معلومات المؤلف والتاريخ */
+    .post-meta {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+
+    /* العنوان الخاص بالردود */
+    .replies-title {
+        font-size: 1.6rem;
+        color: #34495e;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    /* الحاوية الخاصة بالردود */
+    .replies-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* تصميم بطاقة الرد */
+    .reply-card {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    /* محتوى الرد */
+    .reply-content {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    /* معلومات المؤلف والتاريخ للرد */
+    .reply-meta {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+    }
+</style>
+
+
+<div style="text-align: center; margin-top: 20px;">
+    <a href="javascript:history.back()" class="back-button" style="text-decoration: none; color: #ffffff; background-color: #3498db; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">Back</a>
+</div>

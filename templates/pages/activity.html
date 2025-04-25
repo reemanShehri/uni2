@@ -1,0 +1,210 @@
+{%load static%}
+{% comment %} {% extends "base.html" %} {% endcomment %}
+{% load static %}
+
+{% block content %}
+{% comment %} 
+{% include "navbar.html" %} {% endcomment %}
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniHub Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard">
+        <br>
+        <br>
+        <br>
+        <!-- Navbar -->
+        <nav class="navbar">
+            <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+            <h1>UniHub</h1>
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="navbar-icons">
+                <div class="notifications">
+                    <i class="fas fa-bell" id="notificationsIcon"></i>
+                    <div class="notifications-dropdown" id="notificationsDropdown">
+                        <ul>
+                            <li>New message from Felix</li>
+                            <li>Course update available</li>
+                            <li>Reminder: Assignment due tomorrow</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {% comment %} student {% endcomment %}
+
+{% if student.profile_picture %}
+
+    <img src="{{ student.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+{% else %}
+    <img src="/static/images/default-profile.jpg" alt="Default Profile Picture" class="profile-pic">
+{% endif %}
+        </nav>
+        <!-- User Details -->
+        <div class="user-details">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <h1>UniHub</h1>
+                <button class="close-btn" id="closeBtn">&times;</button>
+            </div>
+
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+            <ul class="sidebar-menu">
+                <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="{% url 'course' %}"><i class="fas fa-book"></i> Courses</a></li>
+                <li><a href="{% url 'activity' %}"><i class="fas fa-bell"></i> Activity :</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li>
+                    <button type="submit" onclick="return confirmLogout();">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>           </ul>
+            </form>
+
+
+            
+        </div>
+<link rel="stylesheet" type="text/css" href="{% static 'css/activity.css' %}">
+<div class="activity-container" style="margin-left: 90px;">
+    <!-- Header Section -->
+
+    
+    <div class="activity-header" style="margin-top: 100px; padding-top: 40px;">
+        <h1 class="activity-title">My Activity</h1>
+        <div class="activity-filters">
+            <select class="filter-dropdown">
+                <option>All Activities</option>
+                <option>Courses</option>
+                <option>Discussions</option>
+                <option>Notifications</option>
+            </select>
+            <span class="recent-label">Last 30 days</span>
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="activity-timeline">
+        <!-- Timeline Item 1 -->
+
+        {% for activity in activities %}
+        <div class="timeline-item">
+            <div class="timeline-badge course"></div>
+            <div class="timeline-content">
+
+                
+                <div class="timeline-header">
+                    <span class="activity-type">Course Update</span>
+                    <span class="activity-time">2 hours ago</span>
+                </div>
+                <h3 class="activity-description">{{ activity.title }}</h3>
+                <p class="activity-details">{{ activity.description }}</p>
+                <button class="view-button">View Materials</button>
+            </div>
+        </div>
+
+        {%endfor%}
+
+        <!-- Timeline Item 2 -->
+        {% comment %} <div class="timeline-item">
+            <div class="timeline-badge discussion"></div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="activity-type">Discussion</span>
+                    <span class="activity-time">1 day ago</span>
+                </div>
+                <h3 class="activity-description">John replied to your post in "Programming Basics"</h3>
+                <p class="activity-details">"I found another approach to solve this problem..."</p>
+                <button class="view-button">View Thread</button>
+            </div>
+        </div> {% endcomment %}
+
+        {% comment %} <!-- Timeline Item 3 -->
+        <div class="timeline-item">
+            <div class="timeline-badge system"></div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="activity-type">System</span>
+                    <span class="activity-time">3 days ago</span>
+                </div>
+                <h3 class="activity-description">You successfully registered for "Database Systems"</h3>
+                <p class="activity-details">Course starts on May 15, 2025</p>
+                <button class="view-button">View Syllabus</button>
+            </div>
+        </div> {% endcomment %}
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="activity-stats">
+        <div class="stat-card">
+            <h4>Courses Taken</h4>
+            <p class="stat-value">{{ courses_taken }}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Active Discussions</h4>
+            <p class="stat-value">{{ active_activities }}</p>
+        </div>
+        <div class="stat-card">
+            <h4>Upcoming Deadlines</h4>
+            <p class="stat-value">2</p>
+        </div>
+    </div>
+</div>
+
+
+
+ 
+
+<script>
+    // JavaScript لفتح وإغلاق الشريط الجانبي
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const mainContent = document.getElementById('mainContent');
+
+    menuBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        mainContent.classList.toggle('active');
+    });
+
+    closeBtn.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        mainContent.classList.remove('active');
+    });
+
+    // JavaScript لإظهار وإخفاء قائمة الإشعارات
+    const notificationsIcon = document.getElementById('notificationsIcon');
+    const notificationsDropdown = document.getElementById('notificationsDropdown');
+
+    notificationsIcon.addEventListener('click', () => {
+        notificationsDropdown.classList.toggle('show');
+    });
+
+    // إغلاق قائمة الإشعارات عند النقر خارجها
+    document.addEventListener('click', (event) => {
+        if (!notificationsIcon.contains(event.target)) {
+            notificationsDropdown.classList.remove('show');
+        }
+    });
+
+
+
+
+</script>
+{% endblock %}

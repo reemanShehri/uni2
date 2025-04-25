@@ -1,6 +1,4 @@
-{%load static%}
-
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +8,91 @@
     <link rel="stylesheet" href="{% static 'css/Dashboard.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* تنسيقات جديدة */
+        .main-content {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .chat-board {
+            flex: 2;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .user-info-section {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+        
+        .post-form {
+            margin-bottom: 20px;
+        }
+        
+        .post-form textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            margin-bottom: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .post-form button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .post {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .post-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .post-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .post-actions a {
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .comments {
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 2px solid #eee;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -33,94 +116,137 @@
                     </div>
                 </div>
 
-                {% comment %} student {% endcomment %}
-
-{% if student.profile_picture %}
-
-    <img src="{{ student.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
-{% else %}
-    <img src="/static/images/default-profile.jpg" alt="Default Profile Picture" class="profile-pic">
-{% endif %}
+                {% if student.profile_picture %}
+                    <img src="{{ student.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+                {% else %}
+                    <img src="/static/images/default-profile.jpg" alt="Default Profile Picture" class="profile-pic">
+                {% endif %}
+            </div>
         </nav>
-        <!-- User Details -->
-        <div class="user-details">
+        
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="logo">
                 <h1>UniHub</h1>
                 <button class="close-btn" id="closeBtn">&times;</button>
             </div>
-            <ul class="sidebar-menu">
-                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="#"><i class="fas fa-book"></i> Courses</a></li>
-                <li><a href="#"><i class="fas fa-bell"></i> Activity</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-                <li><a href="#"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
-            </ul>
+
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <ul class="sidebar-menu">
+                    <li><a href="{% url 'dashboard' %}" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="{% url 'course' %}"><i class="fas fa-book"></i> Courses</a></li>
+                    <li><a href="{% url 'activity' %}"><i class="fas fa-bell"></i> Activity</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li>
+                        <button type="submit" onclick="return confirmLogout();">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </li>
+                </ul>
+            </form>
         </div>
 
         <!-- Main Content -->
         <div class="main-content" id="mainContent">
-            <header>
-                <h2>Hello, {{ user.username }}</h2>
-                <p>Welcome back, {{ user.email }}student!</p>
-            </header>
-            
-
-            <!-- Cards Section -->
-            <div class="cards">
-                <div class="card">
-               
-                    <div class="courses">
-                        <h2>MY COURSES</h2>
-                        {% for course in courses %}
-                        <div class="course-item">
-                            {% comment %} user. {% endcomment %}
-                            <p>{{ course.name }} - {{ course.code }}</p>
-                            <div class="details">
-                                <span>{{ course.university.name }}</span>
-                                <p>{{ course.description }}</p>
-                            </div>
+            <!-- قسم الشات بورد على اليسار -->
+            <div class="chat-board">
+                <h2>Discussion Board</h2>
+                
+                <!-- نموذج إنشاء بوست -->
+                <div class="post-form">
+                    <form method="POST" action="{% url 'create_post' %}">
+                        {% csrf_token %}
+                        <textarea name="content" placeholder="What's on your mind?" rows="3"></textarea>
+                        <button type="submit">Post</button>
+                    </form>
+                </div>
+                
+                <!-- عرض البوستات -->
+                {% for post in all_posts %}
+                
+                <div class="post">
+                    <div class="post-header">
+                        <img src="{{ post.author.profile_picture.url|default:'/static/images/default-profile.jpg' }}" class="post-avatar">
+                        <div>
+                            <h4>{{ post.author.username }}</h4>
+                            <small>{{ post.created_at|timesince }} ago</small>
                         </div>
-                        {% endfor %}
+                    </div>
+                    <p>{{ post.content }}</p>
+                    <div class="post-actions">
+                        <a href="#"><i class="far fa-heart"></i> Like ({{ post.likes.count }})</a>
+                        <a href="#"><i class="far fa-comment"></i> Comment</a>
+                        <a href="#"><i class="fas fa-share"></i> Share</a>
                     </div>
                     
-            </div>
-
-            <!-- Activity Section -->
-
-            <div class="courses">
-                <h2>MY COURSES</h2>
-                <div class="course-item">
-                    <p>Egestas dit dui scelerisque ut eu purus aliquam vitae habitasse.</p>
-                    <div class="details">
-                        <span>8 Jane Doe</span>
-                        <p>Lorem Ipsum</p>
+                    <!-- قسم التعليقات -->
+                    <div class="comments">
+                        {% for comment in post.comments.all|slice:":3" %}
+                        <div class="comment">
+                            <div class="post-header">
+                                <img src="{{ comment.author.profile_picture.url|default:'/static/images/default-profile.jpg' }}" class="post-avatar">
+                                <div>
+                                    <h5>{{ comment.author.username }}</h5>
+                                    <small>{{ comment.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                            <p>{{ comment.content }}</p>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- نموذج إضافة تعليق -->
+                        <form method="POST" action="{% url 'add_comment' post.id %}" class="comment-form">
+                            {% csrf_token %}
+                            <input type="text" name="content" placeholder="Write a comment...">
+                            <button type="submit">Send</button>
+                        </form>
                     </div>
                 </div>
-
-            <div class="activity">
-                <h2>ACTIVITY</h2>
-                <ul class="activity-list">
-                    <li class="activity-item">
-                        <input type="checkbox" id="activity1">
-                        <label for="activity1">Felix has replied on</label>
-                        <p>At aliquam enim in cras arcu</p>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labo...</p>
-                    </li>
-                </ul>
+                {% endfor %}
             </div>
-
-
-            <div class="settings">
-                <h2>Settings</h2>
-                <div class="settings-item">
-                    <p><strong>University:</strong> {{ student.university.name }}</p>
-                    <p><strong>Major:</strong> {{ student.major }}</p>
-                    <p><strong>Academic Level:</strong> {{ student.academic_level }}</p>
+            
+            <!-- قسم المعلومات الشخصية على اليمين -->
+            <div class="user-info-section">
+                <header>
+                    <h2>Hello, {{ user.username }}</h2>
+                    <p>Welcome back, {{ user.email }}</p>
+                </header>
+                
+                <!-- قسم الكورسات -->
+                <div class="courses">
+                    <h3>MY COURSES</h3>
+                    {% for course in courses %}
+                    <div class="course-item">
+                        <p>{{ course.name }} - {{ course.code }}</p>
+                        <div class="details">
+                            <span>{{ course.university.name }}</span>
+                            <p>{{ course.description|truncatechars:50 }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- قسم الإعدادات -->
+                <div class="settings">
+                    <h3>Settings</h3>
+                    <div class="settings-item">
+                        <p><strong>University:</strong> {{ student.university}}</p>
+                        <p><strong>Major:</strong> {{ student.major }}</p>
+                        <p><strong>Academic Level:</strong> {{ student.academic_level }}</p>
+                    </div>
                 </div>
             </div>
-        </div>            
+        </div>
+    </div>
+
+
+    <div style="position: fixed; bottom: 20px; right: 20px;">
+        <a href="{% url 'post_list' %}" class="myposts-btn" style="background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: 600;">
+            My Posts
+        </a>
+    </div>
+    
 
     <script>
         // JavaScript لفتح وإغلاق الشريط الجانبي
@@ -149,10 +275,14 @@
 
         // إغلاق قائمة الإشعارات عند النقر خارجها
         document.addEventListener('click', (event) => {
-            if (!notificationsIcon.contains(event.target)) {
+            if (!notificationsIcon.contains(event.target) && !notificationsDropdown.contains(event.target)) {
                 notificationsDropdown.classList.remove('show');
             }
         });
+
+        function confirmLogout() {
+            return confirm("Are you sure you want to log out?");
+        }
     </script>
 </body>
 </html>

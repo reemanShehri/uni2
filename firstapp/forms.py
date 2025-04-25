@@ -182,17 +182,20 @@ class StudentProfileForm(forms.ModelForm):
         exclude = ['user', 'student_id']  # استبعاد student_id لأنه يتم إنشاؤه تلقائيًا
 
 
+from django import forms
+from .models import Post
+
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content']
-    
-    # additionalll
-    def clean_title(self):
-        title = self.cleaned_data.get('title')
-        if Post.objects.filter(title=title).exists():
-            raise forms.ValidationError("A post with this title already exists.")
-        return title
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': "What's on your mind?",
+                'rows': 3
+            })
+        }
     
 
 class ReplyForm(forms.ModelForm):
@@ -204,6 +207,9 @@ class AnnouncementForm(forms.ModelForm):
     class Meta:
         model = Announcement
         fields = ['title', 'content']
+
+
+
 
 
 
